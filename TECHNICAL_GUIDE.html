@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAST-FOODSX — Technical Guide</title>
+<style>
+  :root {
+    --bg: #050108;
+    --bg2: #0a0314;
+    --purple: #a855f7;
+    --purple-2: #7c3aed;
+    --purple-3: #c084fc;
+    --pink: #e879f9;
+    --cyan: #22d3ee;
+    --text: #e9e2f5;
+    --text-dim: #a99ec2;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(168,85,247,0.28);
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --ok: #34d399;
+    --mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:20px; }
+  body {
+    font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background: radial-gradient(1200px 800px at 80% -10%, rgba(168,85,247,0.16), transparent 60%),
+                radial-gradient(1000px 700px at -10% 30%, rgba(124,58,237,0.14), transparent 55%),
+                var(--bg);
+    color: var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  /* glowing animated background orbs */
+  .orb { position:fixed; border-radius:50%; filter:blur(90px); opacity:.35; z-index:-1; animation: float 14s ease-in-out infinite; }
+  .orb1 { width:420px; height:420px; background:#7c3aed; top:-120px; left:-120px; }
+  .orb2 { width:380px; height:380px; background:#a855f7; bottom:-120px; right:-100px; animation-delay:-5s; }
+  .orb3 { width:260px; height:260px; background:#4c1d95; top:45%; left:55%; animation-delay:-9s; }
+  @keyframes float { 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(30px,-40px);} }
+
+  .layout { display:flex; max-width:1500px; margin:0 auto; gap:28px; padding:24px; }
+
+  /* ===== SIDEBAR ===== */
+  aside {
+    width:300px; min-width:300px; height:calc(100vh - 48px);
+    position:sticky; top:24px;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:20px;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    padding:22px 14px;
+    overflow-y:auto;
+    box-shadow:0 0 40px rgba(168,85,247,.15), inset 0 0 30px rgba(168,85,247,.04);
+  }
+  aside::-webkit-scrollbar { width:6px; }
+  aside::-webkit-scrollbar-thumb { background:var(--purple); border-radius:6px; }
+  .brand { text-align:center; padding:8px 4px 16px; border-bottom:1px solid rgba(168,85,247,.2); margin-bottom:14px; }
+  .brand .logo {
+    width:64px; height:64px; margin:0 auto 10px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+    font-size:32px;
+    background:linear-gradient(135deg, var(--purple), var(--purple-2));
+    box-shadow:0 0 30px rgba(168,85,247,.55), 0 0 60px rgba(124,58,237,.3);
+  }
+  .brand h1 { font-size:20px; letter-spacing:.5px; }
+  .brand p { font-size:12px; color:var(--text-dim); }
+  .toc-title { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--purple-3); margin:10px 6px; }
+  .toc { list-style:none; }
+  .toc li { margin:2px 0; }
+  .toc a {
+    display:block; padding:7px 12px; border-radius:10px; font-size:13px; color:var(--text-dim);
+    text-decoration:none; border-left:3px solid transparent; transition:.2s;
+  }
+  .toc a:hover { color:#fff; background:rgba(168,85,247,.12); border-left-color:var(--purple); }
+  .toc a.active { color:#fff; background:linear-gradient(90deg, rgba(168,85,247,.22), transparent); border-left-color:var(--purple-3); }
+
+  /* ===== MAIN ===== */
+  main { flex:1; min-width:0; }
+  .hero {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:24px;
+    padding:46px 40px; margin-bottom:28px; position:relative; overflow:hidden;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    box-shadow:0 0 60px rgba(168,85,247,.18), inset 0 0 60px rgba(124,58,237,.05);
+  }
+  .hero::before { content:''; position:absolute; top:-50%; left:20%; width:60%; height:200%; background:linear-gradient(90deg, transparent, rgba(168,85,247,.08), transparent); transform:rotate(15deg); animation:shine 8s linear infinite; }
+  @keyframes shine { 0%{ transform:translateX(-100%) rotate(15deg);} 100%{ transform:translateX(250%) rotate(15deg);} }
+  .hero .tag {
+    display:inline-block; padding:5px 14px; border-radius:999px; font-size:12px; font-weight:600;
+    background:linear-gradient(90deg, rgba(168,85,247,.25), rgba(124,58,237,.25));
+    border:1px solid var(--glass-border); color:var(--purple-3); margin-bottom:14px;
+  }
+  .hero h2 { font-size:34px; margin-bottom:12px; }
+  .hero h2 span { background:linear-gradient(90deg, var(--purple-3), var(--pink), var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { color:var(--text-dim); max-width:760px; font-size:15px; }
+
+  section { margin-bottom:40px; scroll-margin-top:20px; }
+  h3.sec {
+    font-size:24px; margin:10px 0 20px; padding-bottom:12px;
+    border-bottom:2px solid; border-image:linear-gradient(90deg, var(--purple), transparent) 1;
+    display:flex; align-items:center; gap:12px;
+  }
+  h3.sec .num {
+    min-width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center;
+    border-radius:12px; font-size:16px; font-weight:800;
+    background:linear-gradient(135deg, var(--purple), var(--purple-2));
+    box-shadow:0 0 22px rgba(168,85,247,.5);
+  }
+  h4 { color:var(--purple-3); font-size:17px; margin:26px 0 10px; }
+  p { margin:10px 0; color:var(--text); }
+  strong { color:#fff; }
+
+  /* cards */
+  .card {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+    padding:20px 22px; margin:14px 0; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    transition:.25s;
+  }
+  .card:hover { border-color:rgba(192,132,252,.5); box-shadow:0 0 30px rgba(168,85,247,.22); transform:translateY(-2px); }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px; }
+
+  /* tables */
+  .tbl-wrap { overflow-x:auto; margin:16px 0; border-radius:14px; border:1px solid var(--glass-border); background:var(--glass); backdrop-filter:blur(10px); }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { background:linear-gradient(90deg, rgba(168,85,247,.22), rgba(124,58,237,.1)); color:var(--purple-3); text-align:left; padding:12px 14px; font-size:12.5px; letter-spacing:.5px; text-transform:uppercase; }
+  td { padding:11px 14px; border-top:1px solid rgba(168,85,247,.12); color:var(--text); vertical-align:top; }
+  tr:hover td { background:rgba(168,85,247,.06); }
+
+  /* code */
+  pre {
+    position:relative; background:#0d0418; border:1px solid rgba(168,85,247,.3); border-radius:14px;
+    padding:16px 18px; margin:16px 0; overflow-x:auto; font-family:var(--mono); font-size:13px; line-height:1.6;
+    box-shadow:inset 0 0 30px rgba(124,58,237,.08), 0 0 20px rgba(168,85,247,.12);
+  }
+  pre .lang { position:absolute; top:8px; right:12px; font-size:10px; letter-spacing:1.5px; color:var(--purple-3); text-transform:uppercase; }
+  code { font-family:var(--mono); background:rgba(168,85,247,.14); color:var(--pink); padding:2px 6px; border-radius:6px; font-size:.9em; }
+  pre code { background:none; color:#d8c7f5; padding:0; }
+
+  /* callouts */
+  .callout { border-radius:14px; padding:14px 18px; margin:16px 0; border-left:4px solid; font-size:14px; }
+  .callout.info { background:rgba(34,211,238,.08); border-color:var(--cyan); color:#b8eefb; }
+  .callout.warn { background:rgba(251,191,36,.08); border-color:var(--warn); color:#fde9c3; }
+  .callout.danger { background:rgba(248,113,113,.08); border-color:var(--danger); color:#ffd6d6; }
+  .callout.ok { background:rgba(52,211,153,.08); border-color:var(--ok); color:#c6f7e4; }
+
+  ul, ol { padding-left:24px; margin:10px 0; }
+  li { margin:5px 0; color:var(--text); }
+  li::marker { color:var(--purple-3); }
+
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:11.5px; font-weight:600; margin:2px 4px 2px 0; border:1px solid rgba(168,85,247,.35); background:rgba(168,85,247,.12); color:var(--purple-3); }
+  .pill.green { border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.1); color:#6ee7b7; }
+  .pill.red { border-color:rgba(248,113,113,.4); background:rgba(248,113,113,.1); color:#fca5a5; }
+  .pill.cyan { border-color:rgba(34,211,238,.4); background:rgba(34,211,238,.1); color:#67e8f9; }
+
+  .kbd { display:inline-block; padding:2px 8px; border-radius:6px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-bottom-width:2px; font-family:var(--mono); font-size:12px; }
+
+  .step { display:flex; gap:14px; margin:14px 0; }
+  .step .n { min-width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg, var(--purple), var(--purple-2)); display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow:0 0 16px rgba(168,85,247,.45); }
+  .step .b { flex:1; }
+
+  footer { text-align:center; color:var(--text-dim); font-size:13px; padding:30px 10px 10px; border-top:1px solid rgba(168,85,247,.15); margin-top:20px; }
+
+  @media (max-width:1024px){
+    .layout { flex-direction:column; }
+    aside { position:static; width:100%; height:auto; max-height:360px; }
+  }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+<div class="layout">
+  <aside>
+    <div class="brand">
+      <div class="logo">🍔</div>
+      <h1>FAST-FOODSX</h1>
+      <p>Complete Technical Guide</p>
+    </div>
+    <div class="toc-title">Contents</div>
+    <ul class="toc">
+      <li><a href="#s1">1. What is Fast-FoodsX?</a></li>
+      <li><a href="#s2">2. The Technology Stack</a></li>
+      <li><a href="#s3">3. How the System Works</a></li>
+      <li><a href="#s4">4. Complete Project Structure</a></li>
+      <li><a href="#s5">5. Backend — File by File</a></li>
+      <li><a href="#s6">6. Frontend — File by File</a></li>
+      <li><a href="#s7">7. How the Main Features Work</a></li>
+      <li><a href="#s8">8. How to Run This Project</a></li>
+      <li><a href="#s9">9. How to Add a New Feature</a></li>
+      <li><a href="#s10">10. Where Should a New Developer Start?</a></li>
+      <li><a href="#s11">11. Pushing to GitHub</a></li>
+      <li><a href="#s12">12. Known Issues &amp; Fixes</a></li>
+      <li><a href="#s13">13. Simple Glossary</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <span class="tag">⚡ Developer Documentation</span>
+      <h2>FAST-FOODSX <span>Technical Guide</span></h2>
+      <p>A simple, friendly guide that explains <strong>everything</strong> about this project — written so even a <strong>non-technical person</strong> can understand how Fast-FoodsX works, what every file does, how to change things, and how to push it to GitHub.</p>
+      <p><span class="pill">Frontend: React</span><span class="pill">Backend: Node.js + Express</span><span class="pill">Database: MongoDB</span><span class="pill">Real-time: Socket.IO</span></p>
+    </div>
+
+    <!-- ===================== SECTION 1 ===================== -->
+    <section id="s1">
+      <h3 class="sec"><span class="num">1</span> What is Fast-FoodsX?</h3>
+      <p><strong>Fast-FoodsX is a complete online food ordering and delivery web application</strong> — like a smaller version of <strong>Swiggy, Zomato, or DoorDash</strong>.</p>
+      <div class="card">
+        <strong>Simple analogy:</strong><br>
+        🎨 The <strong>frontend</strong> is the <strong>waiter</strong> who takes your order and shows you the menu.<br>
+        ⚙️ The <strong>backend</strong> is the <strong>kitchen</strong> where the food is prepared, plus the <strong>ledger</strong> where every order is recorded.<br>
+        🗄️ The <strong>database</strong> is the <strong>storehouse</strong> where all information is kept safe.
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Part</th><th>Folder</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>🎨 Frontend</td><td><code>frontend/</code></td><td>The website the customer sees (menu, cart, checkout, login, admin panel).</td></tr>
+          <tr><td>⚙️ Backend</td><td><code>backend/</code></td><td>The brain &amp; engine — stores data, checks logins, processes orders, talks to the database.</td></tr>
+        </tbody>
+      </table></div>
+      <h4>Features this app has</h4>
+      <div class="grid3">
+        <div class="card">👤 User registration &amp; login (with OTP password reset)</div>
+        <div class="card">🍕 Menu / Dishes (search, filter, sort, details)</div>
+        <div class="card">🛒 Shopping cart (variations, instructions)</div>
+        <div class="card">💳 Checkout &amp; payments (COD, card, UPI)</div>
+        <div class="card">🚚 Order tracking &amp; delivery management</div>
+        <div class="card">🏷️ Coupons, deals &amp; offers</div>
+        <div class="card">🪙 Coins &amp; vouchers (loyalty program)</div>
+        <div class="card">💬 Real-time customer↔admin chat</div>
+        <div class="card">⭐ Reviews &amp; ratings with admin approval</div>
+        <div class="card">📊 Admin dashboard with charts &amp; reports</div>
+        <div class="card">🔔 In-app notifications</div>
+        <div class="card">👷 Rider / delivery partner registration</div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 2 ===================== -->
+    <section id="s2">
+      <h3 class="sec"><span class="num">2</span> The Technology Stack</h3>
+      <p>This is the list of <strong>technologies (languages and tools)</strong> the developers used. <strong>Frontend</strong> = what the user sees. <strong>Backend</strong> = the server. <strong>Database</strong> = where information is stored.</p>
+
+      <h4>🎨 Frontend Technologies</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Technology</th><th>What it is / Why it is used</th></tr></thead>
+        <tbody>
+          <tr><td><strong>React 19</strong></td><td>The library that builds the user interface (pages you see) using reusable "components".</td></tr>
+          <tr><td><strong>React Router</strong></td><td>Navigation between pages (Home, Login, Cart, Admin).</td></tr>
+          <tr><td><strong>Redux Toolkit</strong></td><td>The app's "global memory" — login, cart, dishes, orders available everywhere.</td></tr>
+          <tr><td><strong>Redux Persist</strong></td><td>Saves Redux state into browser storage so refresh keeps your cart &amp; login.</td></tr>
+          <tr><td><strong>Axios</strong></td><td>Talks to the backend API (sends/receives data).</td></tr>
+          <tr><td><strong>Formik + Yup</strong></td><td>Form handling and validation ("email must be valid").</td></tr>
+          <tr><td><strong>Framer Motion</strong></td><td>Animation library — smooth page &amp; card animations.</td></tr>
+          <tr><td><strong>GSAP + ScrollTrigger</strong></td><td>Advanced scroll animations (film-frame hero).</td></tr>
+          <tr><td><strong>Three.js</strong></td><td>3D graphics — particle background on the home page.</td></tr>
+          <tr><td><strong>Chart.js + react-chartjs-2</strong></td><td>Admin dashboard charts (line, bar, pie, doughnut).</td></tr>
+          <tr><td><strong>Socket.IO Client</strong></td><td>Real-time communication (live chat, live updates).</td></tr>
+          <tr><td><strong>react-toastify / react-hot-toast</strong></td><td>Pop-up notification messages.</td></tr>
+          <tr><td><strong>SweetAlert2</strong></td><td>Nice confirmation pop-ups ("Are you sure?").</td></tr>
+          <tr><td><strong>react-icons</strong></td><td>Icons (cart, truck, star…).</td></tr>
+          <tr><td><strong>Emoji Picker React</strong></td><td>Emoji picker in chat &amp; comments.</td></tr>
+          <tr><td><strong>react-credit-cards-2</strong></td><td>Styled card input in checkout.</td></tr>
+          <tr><td><strong>xlsx + file-saver</strong></td><td>Export/download data to Excel/CSV.</td></tr>
+          <tr><td><strong>Lenis</strong></td><td>Smooth scrolling.</td></tr>
+          <tr><td><strong>react-helmet-async</strong></td><td>Page titles &amp; meta tags (SEO).</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>⚙️ Backend Technologies</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Technology</th><th>What it is / Why it is used</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Node.js</strong></td><td>Lets JavaScript run on a server, outside the browser.</td></tr>
+          <tr><td><strong>Express 5</strong></td><td>The web framework — creates the URLs (routes) the frontend calls.</td></tr>
+          <tr><td><strong>MongoDB + Mongoose</strong></td><td>The database + the tool that defines data shapes (Models).</td></tr>
+          <tr><td><strong>JWT</strong></td><td>The "login ticket" proving who you are on every request.</td></tr>
+          <tr><td><strong>bcryptjs</strong></td><td>Scrambles (hashes) passwords so they're never stored in plain text.</td></tr>
+          <tr><td><strong>express-validator</strong></td><td>Validates incoming data.</td></tr>
+          <tr><td><strong>Multer</strong></td><td>Handles file uploads (images).</td></tr>
+          <tr><td><strong>Cloudinary</strong></td><td>Cloud image storage &amp; serving.</td></tr>
+          <tr><td><strong>Nodemailer</strong></td><td>Sends emails (OTP, order confirmations).</td></tr>
+          <tr><td><strong>Socket.IO</strong></td><td>Real-time two-way communication (chat, live status).</td></tr>
+          <tr><td><strong>Helmet</strong></td><td>Security headers.</td></tr>
+          <tr><td><strong>CORS</strong></td><td>Allows frontend (3000) to talk to backend (5000).</td></tr>
+          <tr><td><strong>Morgan</strong></td><td>Logs every request.</td></tr>
+          <tr><td><strong>Compression</strong></td><td>Compresses responses for faster loading.</td></tr>
+          <tr><td><strong>express-rate-limit</strong></td><td>Anti-spam — limits requests per user.</td></tr>
+          <tr><td><strong>dotenv</strong></td><td>Loads secrets from <code>.env</code>.</td></tr>
+          <tr><td><strong>Nodemon</strong></td><td>Auto-restarts the server on code changes (dev).</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>🗄️ Database (MongoDB — <code>fast_foodsx</code>)</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Collection</th><th>Stores</th></tr></thead>
+        <tbody>
+          <tr><td><code>users</code></td><td>Customers, admins, delivery boys</td></tr>
+          <tr><td><code>dishes</code></td><td>Food items (name, price, images, variations)</td></tr>
+          <tr><td><code>categories</code></td><td>Pizza, Burgers, Desserts…</td></tr>
+          <tr><td><code>orders</code> / <code>carts</code></td><td>Orders placed &amp; each user's cart</td></tr>
+          <tr><td><code>deliveries</code> / <code>riders</code> / <code>deliveryboys</code></td><td>Deliveries &amp; rider profiles</td></tr>
+          <tr><td><code>coupons</code> / <code>deals</code> / <code>vouchers</code></td><td>Discounts &amp; offers</td></tr>
+          <tr><td><code>cointransactions</code></td><td>Coin earn/spend history (loyalty)</td></tr>
+          <tr><td><code>reviews</code></td><td>Reviews &amp; ratings</td></tr>
+          <tr><td><code>chats</code> / <code>messages</code></td><td>Chat messages</td></tr>
+          <tr><td><code>notifications</code> / <code>payments</code> / <code>contacts</code></td><td>Notifications, payments, contact forms</td></tr>
+          <tr><td><code>settings</code></td><td>Store settings (tax, delivery fee…)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== SECTION 3 ===================== -->
+    <section id="s3">
+      <h3 class="sec"><span class="num">3</span> How the System Works (Architecture)</h3>
+      <h4>🏗️ The Big Picture</h4>
+      <pre><span class="lang">architecture</span>┌─────────────────────────────┐          ┌─────────────────────────────┐
+│  FRONTEND (Browser)       │   HTTP   │  BACKEND (Server)         │
+│  React App · Port 3000    │ ───────► │  Express / Node.js 5000   │
+└─────────────────────────────┘  ◄────── └─────────────┬───────────────┘
+                                                      │  (Mongoose)
+                                                      ▼
+                                       ┌─────────────────────────────┐
+                                       │  DATABASE · MongoDB         │
+                                       │  (fast_foodsx)              │
+                                       └─────────────────────────────┘
+                                                      ▲
+                    Socket.IO (real-time chat/updates) ┘</pre>
+
+      <h4>🔄 How a request travels (Step by Step)</h4>
+      <p>Let's follow what happens when a user clicks <strong>"Add to Cart"</strong>:</p>
+      <div class="step"><div class="n">1</div><div class="b"><strong>Browser (Frontend)</strong> — the React page calls a function in a <strong>service file</strong> (<code>frontend/src/services/cart.service.js</code>).</div></div>
+      <div class="step"><div class="n">2</div><div class="b"><strong>Service</strong> — uses <strong>Axios</strong> to send <code>POST http://localhost:5000/api/cart/add</code> with the dish ID, quantity, and the user's token.</div></div>
+      <div class="step"><div class="n">3</div><div class="b"><strong>Router</strong> — the request arrives at <code>server.js</code>, which forwards it to <code>cart.routes.js</code>.</div></div>
+      <div class="step"><div class="n">4</div><div class="b"><strong>Middleware</strong> — <code>protect</code> reads the token to confirm the user is logged in.</div></div>
+      <div class="step"><div class="n">5</div><div class="b"><strong>Controller</strong> — <code>cart.controller.js → addToCart</code> contains the business logic.</div></div>
+      <div class="step"><div class="n">6</div><div class="b"><strong>Model</strong> — uses the <strong>Mongoose Model</strong> (<code>Cart.js</code>) to read/save data in MongoDB.</div></div>
+      <div class="step"><div class="n">7</div><div class="b"><strong>Response</strong> — sends back JSON (<code>{ success: true, cart: {...} }</code>).</div></div>
+      <div class="step"><div class="n">8</div><div class="b"><strong>Back to the Browser</strong> — React updates the screen (cart badge count changes).</div></div>
+      <div class="callout info">💡 <strong>Same pattern for every feature:</strong> Page/Component → Service → Route → Middleware → Controller → Model → Database.</div>
+
+      <h4>📁 The Layered Architecture</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Layer</th><th>Folder</th><th>Job</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Routes</strong></td><td><code>backend/src/routes/</code></td><td>Define URLs &amp; which controller handles them — "the map".</td></tr>
+          <tr><td><strong>Controllers</strong></td><td><code>backend/src/controllers/</code></td><td>The logic — decide what happens for each request — "the kitchen".</td></tr>
+          <tr><td><strong>Models</strong></td><td><code>backend/src/models/</code></td><td>Define the shape of database data — "the filing system".</td></tr>
+          <tr><td><strong>Middleware</strong></td><td><code>backend/src/middleware/</code></td><td>Checkpoints between route &amp; controller (login, uploads) — "security guards".</td></tr>
+          <tr><td><strong>Services</strong></td><td><code>backend/src/services/</code></td><td>Reusable helpers (JWT, emails, payments) — "the tools".</td></tr>
+          <tr><td><strong>Utils</strong></td><td><code>backend/src/utils/</code></td><td>Small utilities — "the small gadgets".</td></tr>
+          <tr><td><strong>Validators</strong></td><td><code>backend/src/validators/</code></td><td>Input-checking rules — "the inspectors".</td></tr>
+          <tr><td><strong>Sockets</strong></td><td><code>backend/src/sockets/</code></td><td>Real-time features — "the walkie-talkies".</td></tr>
+          <tr><td><strong>Config</strong></td><td><code>backend/src/config/</code></td><td>Setup files — "the settings".</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== SECTION 4 ===================== -->
+    <section id="s4">
+      <h3 class="sec"><span class="num">4</span> Complete Project Structure</h3>
+      <p>The full folder tree with a <strong>one-line plain-English explanation</strong> for every file.</p>
+      <pre><span class="lang">tree</span>FAST-FOODSX/
+│
+├── TECHINICAL_GUIDE.md / USER_GUIDE.md   ← This guide + companion user guide
+│
+├── backend/                       ← 🧠 The server / "kitchen"
+│   ├── server.js                  ← THE ENTRY POINT. Starts server, connects MongoDB, wires routes.
+│   ├── package.json               ← Lists backend libraries & scripts (npm start, npm run dev).
+│   ├── package-lock.json          ← Locks exact library versions.
+│   ├── .env                       ← Secret settings (port, DB URL, email, Cloudinary keys).
+│   ├── create-permanent-admin.js  ← Script to create a permanent admin account.
+│   ├── seed-delivery-data.js      ← Script that fills the DB with sample delivery data.
+│   ├── logs/                      ← Daily log files.
+│   ├── uploads/                   ← Where uploaded images are saved first.
+│   └── src/
+│       ├── config/                ← Settings for external services
+│       │   ├── database.js        ← Connects to MongoDB.
+│       │   ├── cloudinary.js      ← Sets up Cloudinary image storage.
+│       │   └── email.js           ← Sets up email sending (Nodemailer).
+│       ├── middleware/            ← Security guards & checkpoints
+│       │   ├── auth.js            ← Checks login token (protect) & admin rights (adminOnly).
+│       │   ├── errorHandler.js    ← Catches all errors, sends friendly responses.
+│       │   ├── rateLimiter.js     ← Anti-spam (request limits).
+│       │   ├── upload.js          ← Handles image uploads (Multer).
+│       │   └── validation.js      ← Validates register/login data.
+│       ├── models/                ← Database shapes (Mongoose)
+│       │   ├── User.js / Dish.js / Category.js / Order.js / Cart.js / Address.js
+│       │   ├── Coupon.js / Deal.js / Voucher.js / CoinTransaction.js
+│       │   ├── Delivery.js / DeliveryBoy.js / Rider.js
+│       │   ├── Chat.js / Message.js / Notification.js / Payment.js
+│       │   ├── Review.js / Contact.js / Setting.js
+│       ├── controllers/           ← The kitchen (business logic) — 25 files
+│       ├── routes/                ← The URL map — 25 files
+│       ├── services/              ← Reusable tools (JWT, OTP, email, cloudinary, payment)
+│       ├── sockets/               ← Real-time (index.js = live events, chat.js = live chat)
+│       ├── utils/                 ← Small helpers (error, logger, response, validation)
+│       ├── validators/            ← Data inspectors (auth, admin, dish, order)
+│       └── seeders/admin.seeder.js← Creates default admin + sample categories/dishes.
+│
+└── frontend/                       ← 🎨 The website / "the waiter"
+    ├── package.json / package-lock.json / .env / .gitignore / README.md
+    ├── public/
+    │   ├── index.html             ← The single HTML page hosting the React app.
+    │   ├── manifest.json / robots.txt / favicon.ico / logos
+    │   └── frames/                ← 38 images used for the animated hero film.
+    └── src/
+        ├── index.js               ← ENTRY POINT. Mounts the whole app.
+        ├── App.js                 ← Defines all pages (routes).
+        ├── styles/                ← Global styles (variables, global, animations, mobile).
+        ├── store/                 ← Redux global memory (index, auth, cart, dish, order slices).
+        ├── services/              ← Messengers to the backend (api, auth, cart, dish, order, admin, coin).
+        ├── hooks/                 ← Reusable hooks (useApiWithTimeout, useCoins).
+        └── components/            ← Building blocks
+            ├── common/            ← Navbar, Footer, LoadingSpinner, CollectButton
+            ├── auth/              ← Login, Register, Forgot/Reset/Change Password
+            ├── home/ + landing/   ← Home page & cinematic hero
+            ├── dishes/            ← Menu pages (DishesPage, DishCard, DishDetail…)
+            ├── categories/ cart/ deals/
+            ├── about/ faq/ contact/
+            ├── chat/ user/ Rider/
+            └── admin/             ← 🛡️ Full admin panel (dashboard, dishes, orders,
+                                     customers, coupons, deals, reviews, payments,
+                                     delivery, chat, settings, notifications…)</pre>
+    </section>
+
+    <!-- ===================== SECTION 5 ===================== -->
+    <section id="s5">
+      <h3 class="sec"><span class="num">5</span> Backend Explained — File by File</h3>
+
+      <h4>5.1 <code>server.js</code> — The Heart of the Backend 🫀</h4>
+      <div class="card">
+        <p><strong>Purpose:</strong> The entry point. When you run the backend, this file starts everything.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Code</th><th>What it does (plain English)</th></tr></thead>
+          <tbody>
+            <tr><td><code>require('express')</code> etc.</td><td>Loads the libraries (Express, Mongoose, CORS, Helmet…).</td></tr>
+            <tr><td><code>dotenv.config()</code></td><td>Loads secret settings from <code>.env</code>.</td></tr>
+            <tr><td><code>const app = express()</code></td><td>Creates the web server application.</td></tr>
+            <tr><td><code>createServer(app)</code> + Socket.IO</td><td>Creates a server that supports real-time connections.</td></tr>
+            <tr><td>Helmet / CORS / Compression / Morgan</td><td>Security headers, cross-origin access, compression, request logging.</td></tr>
+            <tr><td><code>express.json()</code></td><td>Reads incoming JSON request bodies.</td></tr>
+            <tr><td><code>app.use('/uploads', …)</code></td><td>Makes uploaded images available at a public URL.</td></tr>
+            <tr><td>Rate limiters</td><td>Protects the API from spam.</td></tr>
+            <tr><td><code>/health</code> endpoint</td><td>A quick "is the server alive?" check.</td></tr>
+            <tr><td><code>app.use('/api/…', routes)</code></td><td>Connects every route file to its URL path.</td></tr>
+            <tr><td>404 handler</td><td>Friendly "not found" for unknown URLs.</td></tr>
+            <tr><td>Error handler</td><td>Catches errors and returns clean responses.</td></tr>
+            <tr><td>Graceful shutdown</td><td>Closes connections cleanly when the server stops.</td></tr>
+            <tr><td><code>startServer()</code></td><td>Connects to MongoDB and listens on port 5000.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <h4>5.2 Config Files (<code>src/config/</code>)</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>database.js</code></strong><br>Connects to MongoDB using the URL in <code>.env</code>. Returns true/false so the app knows if the connection worked.</div>
+        <div class="card"><strong><code>cloudinary.js</code></strong><br>Reads Cloudinary keys from <code>.env</code> and sets up the image service. All image uploads use this.</div>
+        <div class="card"><strong><code>email.js</code></strong><br>Creates an email sender (Nodemailer). Exports <code>sendEmail(to, subject, html)</code> used for OTPs and contact replies.</div>
+      </div>
+
+      <h4>5.3 Middleware (<code>src/middleware/</code>) — The Security Guards</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>auth.js</code></strong><br><code>protect</code> verifies the JWT token &amp; attaches <code>req.user</code>. <code>adminOnly</code> checks <code>role === 'admin'</code>.</div>
+        <div class="card"><strong><code>errorHandler.js</code></strong><br>"Emergency room" — converts any error into a friendly JSON response with the right status code.</div>
+        <div class="card"><strong><code>rateLimiter.js</code></strong><br>Anti-spam: <code>apiLimiter</code> 200/min, <code>authLimiter</code> 30/min, <code>coinLimiter</code> 100/min.</div>
+        <div class="card"><strong><code>upload.js</code></strong><br>Multer image uploads saved to <code>uploads/</code>; only image types allowed, 5MB limit.</div>
+        <div class="card"><strong><code>validation.js</code></strong><br>Runs <code>express-validator</code> rules and returns errors if data is invalid.</div>
+      </div>
+
+      <h4>5.4 Models (<code>src/models/</code>) — The Database Shapes</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Model</th><th>Stores / Special features</th></tr></thead>
+        <tbody>
+          <tr><td><code>User.js</code></td><td>Customers/admins/delivery boys; password auto-hashed with bcrypt; <code>comparePassword</code>; wishlist, loyalty points.</td></tr>
+          <tr><td><code>Dish.js</code></td><td>Food items; variations, sizes, toppings; text index for fast search.</td></tr>
+          <tr><td><code>Category.js</code></td><td>Menu categories with unique slug and sort order.</td></tr>
+          <tr><td><code>Order.js</code></td><td>Orders with unique number, items, totals, status lifecycle, payment info.</td></tr>
+          <tr><td><code>Cart.js</code></td><td>One cart per user with items, variations, total.</td></tr>
+          <tr><td><code>Address.js</code></td><td>Saved delivery addresses (home/work/other) with GPS.</td></tr>
+          <tr><td><code>Coupon.js</code> / <code>Deal.js</code></td><td>Discount coupons &amp; promotional deals.</td></tr>
+          <tr><td><code>Voucher.js</code></td><td>Loyalty vouchers with auto-generated codes &amp; expiry.</td></tr>
+          <tr><td><code>CoinTransaction.js</code></td><td>The "bank statement" of coins (earned/spent/bonus).</td></tr>
+          <tr><td><code>Delivery.js</code> / <code>DeliveryBoy.js</code> / <code>Rider.js</code></td><td>Delivery records, partner profiles, rider registration.</td></tr>
+          <tr><td><code>Chat.js</code> / <code>Message.js</code></td><td>Chat messages with read flags and indexes.</td></tr>
+          <tr><td><code>Notification.js</code> / <code>Payment.js</code></td><td>In-app notifications &amp; payment records.</td></tr>
+          <tr><td><code>Review.js</code></td><td>Dish reviews with pending/approved/rejected status &amp; admin response.</td></tr>
+          <tr><td><code>Contact.js</code> / <code>Setting.js</code></td><td>Contact-form messages &amp; store settings.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>5.5 Controllers (<code>src/controllers/</code>) — The Business Logic</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>auth.controller.js</code></strong><br>Register, login, OTP send/verify, reset &amp; change password. Issues JWT tokens.</div>
+        <div class="card"><strong><code>user.controller.js</code></strong><br>Profile, avatar upload, wishlist, addresses (default-address logic), notifications.</div>
+        <div class="card"><strong><code>dish.controller.js</code></strong><br>List/filter/sort dishes, CRUD with Cloudinary uploads, add review.</div>
+        <div class="card"><strong><code>category.controller.js</code></strong><br>Category browsing + admin CRUD with slug generation &amp; image upload.</div>
+        <div class="card"><strong><code>cart.controller.js</code></strong><br>Get/add/update/remove/clear cart. Always recalculates the total.</div>
+        <div class="card"><strong><code>order.controller.js</code></strong><br>Create orders from cart, track, update status (fires socket events + notifications), delete.</div>
+        <div class="card"><strong><code>payment.controller.js</code></strong><br>Payment records, filters/aggregations, admin alerts.</div>
+        <div class="card"><strong><code>delivery.controller.js</code></strong><br>Delivery management, rider assignment, stats, sync/seed. Many socket events.</div>
+        <div class="card"><strong><code>admin.controller.js</code></strong><br>The main admin panel — dashboard stats + CRUD for everything.</div>
+        <div class="card"><strong><code>coins.controller.js</code></strong><br>Loyalty engine: coins, vouchers, leaderboard, earn (1 coin/$100), voucher every 20 orders.</div>
+        <div class="card"><strong><code>coinCollectController.js</code></strong><br>Collect coins/vouchers by "scanning" dishes.</div>
+        <div class="card"><strong><code>coupon.controller.js</code></strong><br>Validate coupons &amp; CRUD.</div>
+        <div class="card"><strong><code>deal.controller.js</code></strong><br>Deals CRUD + syncs discounts onto member dishes.</div>
+        <div class="card"><strong><code>chat.controller.js</code></strong><br>Chat users, messages, recent chats with unread counts.</div>
+        <div class="card"><strong><code>contact.controller.js</code></strong><br>Contact form + confirmation email.</div>
+        <div class="card"><strong><code>review.controller.js</code></strong><br>Users add reviews (pending), recompute dish average rating.</div>
+        <div class="card"><strong><code>settings.controller.js</code></strong><br>Get/update store &amp; security settings (lazy defaults).</div>
+        <div class="card"><strong><code>staff.controller.js</code></strong><br>Manage staff &amp; delivery boy accounts, toggle active.</div>
+        <div class="card"><strong><code>report.controller.js</code></strong><br>Sales reports, best sellers, customer analytics.</div>
+        <div class="card"><strong><code>media.controller.js</code> / <code>upload.controller.js</code></strong><br>Cloudinary upload/delete; comment-image upload.</div>
+        <div class="card"><strong><code>adminCoins.controller.js</code> / <code>adminReviewController.js</code> / <code>notificationController.js</code></strong><br>Admin coin discounts &amp; vouchers; review moderation; notifications.</div>
+      </div>
+
+      <h4>5.6 Routes — The URL Map</h4>
+      <div class="card">
+        <p>Each route file connects <strong>URLs to controller functions</strong> and applies middleware. Example — <code>cart.routes.js</code>:</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Method</th><th>URL</th><th>Controller</th><th>Protected?</th></tr></thead>
+          <tbody>
+            <tr><td>GET</td><td><code>/api/cart</code></td><td><code>getCart</code></td><td>✅</td></tr>
+            <tr><td>POST</td><td><code>/api/cart/add</code></td><td><code>addToCart</code></td><td>✅</td></tr>
+            <tr><td>PUT</td><td><code>/api/cart/item/:itemId</code></td><td><code>updateCartItem</code></td><td>✅</td></tr>
+            <tr><td>DELETE</td><td><code>/api/cart/item/:itemId</code></td><td><code>removeFromCart</code></td><td>✅</td></tr>
+            <tr><td>DELETE</td><td><code>/api/cart/clear</code></td><td><code>clearCart</code></td><td>✅</td></tr>
+          </tbody>
+        </table></div>
+        <p>Important public routes: <code>POST /api/auth/register</code>, <code>POST /api/auth/login</code>, <code>GET /api/dishes</code>, <code>GET /api/categories</code>. Admin routes live under <code>/api/admin/*</code>, <code>/api/delivery/admin/*</code>, <code>/api/reports/*</code>.</p>
+      </div>
+
+      <h4>5.7 Services (<code>src/services/</code>) — Reusable Tools</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>jwt.service.js</code></strong><br>Creates login tokens (7d), refresh tokens (30d), verifies them.</div>
+        <div class="card"><strong><code>otp.service.js</code></strong><br>Generates 6-digit OTP and checks validity (10-min expiry).</div>
+        <div class="card"><strong><code>email.service.js</code></strong><br>Sends branded emails: OTP, welcome, order confirmation, reset.</div>
+        <div class="card"><strong><code>cloudinary.service.js</code></strong><br>Upload/delete/build URLs for images.</div>
+        <div class="card"><strong><code>payment.service.js</code></strong><br>Math helpers: totals, tax, discounts, coupon validation.</div>
+        <div class="card"><strong><code>wt.service.js</code> &amp; <code>cart.service.js</code></strong><br>⚠️ Duplicate/leftover files — see Section 12.</div>
+      </div>
+
+      <h4>5.8 Sockets, Utils, Validators, Scripts</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>sockets/index.js</code></strong><br>Live order/payment/delivery events + notification read-marking.</div>
+        <div class="card"><strong><code>sockets/chat.js</code></strong><br>Full live chat: online status, messages, typing, read receipts.</div>
+        <div class="card"><strong><code>utils/error.util.js</code></strong><br>Custom error types (Validation 400, Auth 401, Not Found 404…).</div>
+        <div class="card"><strong><code>utils/logger.util.js</code></strong><br>Logs to console + daily files in <code>logs/</code>.</div>
+        <div class="card"><strong><code>utils/response.util.js</code></strong><br>Standard success/error/paginated response format.</div>
+        <div class="card"><strong><code>utils/notificationHelper.js</code></strong><br>Saves a notification &amp; broadcasts it live to user + admin rooms.</div>
+        <div class="card"><strong><code>validators/*</code></strong><br>Input rules for auth, admin, dishes, orders.</div>
+        <div class="card"><strong><code>seeders/admin.seeder.js</code></strong><br>Creates default admin (<code>admin@fastfoodsx.com</code> / <code>Admin@123</code>), 8 categories, 3 dishes.</div>
+        <div class="card"><strong><code>create-permanent-admin.js</code></strong><br>Guarantees a permanent admin account exists.</div>
+        <div class="card"><strong><code>seed-delivery-data.js</code></strong><br>Fills the DB with 30 days of sample deliveries &amp; 3 riders.</div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 6 ===================== -->
+    <section id="s6">
+      <h3 class="sec"><span class="num">6</span> Frontend Explained — File by File</h3>
+
+      <h4>6.1 Entry Files</h4>
+      <div class="grid2">
+        <div class="card"><strong><code>index.js</code></strong><br>The first file the browser loads. Wraps the app in Redux Provider, PersistGate, HelmetProvider, BrowserRouter, and toasts.</div>
+        <div class="card"><strong><code>App.js</code></strong><br>The "router" — defines every page and its URL. Restores the logged-in user from localStorage on load.</div>
+      </div>
+
+      <h4>6.2 Redux Store — Global Memory</h4>
+      <div class="grid2">
+        <div class="card"><strong><code>index.js</code></strong><br>Creates the store from all slices + adds redux-persist (auth &amp; cart survive refresh).</div>
+        <div class="card"><strong><code>authSlice.js</code></strong><br>Holds <code>isAuthenticated</code>, <code>user</code>, <code>token</code>. Actions: <code>loginSuccess</code>, <code>logout</code>, <code>updateUser</code>.</div>
+        <div class="card"><strong><code>cartSlice.js</code></strong><br>Holds cart items + total. Thunk actions call the cart service: <code>loadCart</code>, <code>addToCart</code>, <code>updateCartItem</code>, <code>removeFromCart</code>, <code>clearCart</code>.</div>
+        <div class="card"><strong><code>dishSlice.js</code> / <code>orderSlice.js</code></strong><br>Dish list &amp; orders state.</div>
+      </div>
+
+      <h4>6.3 Services — The Messengers</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>api.js</code></strong><br>⚠️ The most important file. One Axios instance: auto-adds the token, caches GETs (30s), retries on 429, refreshes token on 401.</div>
+        <div class="card"><strong><code>auth.service.js</code></strong><br>register, login, sendOTP, verifyOTP, resetPassword, changePassword, loadUser.</div>
+        <div class="card"><strong><code>cart.service.js</code></strong><br>Cart API functions used by the cart slice.</div>
+        <div class="card"><strong><code>dish.service.js</code></strong><br>getAllDishes, getDishById, popular, trending, deals.</div>
+        <div class="card"><strong><code>order.service.js</code></strong><br>createOrder, getUserOrders, getOrderById, updateOrderStatus, delete.</div>
+        <div class="card"><strong><code>admin.service.js</code> / <code>coinService.js</code></strong><br>Admin API functions; coins/vouchers API with request deduplication.</div>
+      </div>
+
+      <h4>6.4 Hooks</h4>
+      <div class="grid2">
+        <div class="card"><strong><code>useApiWithTimeout.js</code></strong><br>Fetches a URL but cancels/warns after 10 seconds so the page never hangs.</div>
+        <div class="card"><strong><code>useCoins.js</code></strong><br>Loads coins/vouchers with 30s caching; provides <code>collectCoin</code> / <code>collectVoucher</code> with toasts.</div>
+      </div>
+
+      <h4>6.5 Common &amp; Auth Components</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>Navbar.js</code></strong><br>Top menu, role-aware links, cart badge, mobile hamburger.</div>
+        <div class="card"><strong><code>Footer.js</code> / <code>LoadingSpinner.js</code></strong><br>Site footer; "Loading..." spinner.</div>
+        <div class="card"><strong><code>CollectButton.jsx</code></strong><br>"Collect coins / voucher" button on dish cards (uses localStorage so you can't collect twice).</div>
+        <div class="card"><strong><code>Login.js</code></strong><br>Email + password form; saves token, redirects (admins → /admin).</div>
+        <div class="card"><strong><code>Register.js</code></strong><br>Sign-up with confirm password; auto-login.</div>
+        <div class="card"><strong><code>ForgotPassword / ResetPassword / ChangePassword</code></strong><br>OTP-based reset flow &amp; password change.</div>
+      </div>
+
+      <h4>6.6 Home, Menu, Cart</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>Home.js</code></strong><br>Main homepage: trending slider, dish grid, search, wishlist, WhatsApp modal, 3D particles.</div>
+        <div class="card"><strong><code>LandingPage.jsx</code></strong><br>Cinematic film-frame hero (38 frames) with GSAP ScrollTrigger.</div>
+        <div class="card"><strong><code>DishesPage.js</code></strong><br>Full menu: search, filters, sort, load-more, live socket alerts.</div>
+        <div class="card"><strong><code>SingleDishPage.js</code> / <code>DishDetail.js</code></strong><br>Dish detail; the latter has a full comments/reviews system.</div>
+        <div class="card"><strong><code>Cart.js</code></strong><br>Cart items, quantity controls, order summary.</div>
+        <div class="card"><strong><code>Checkout.js</code></strong><br>Order form: contact, address, payment (COD/card/UPI), coupons, success screen.</div>
+      </div>
+
+      <h4>6.7 User Area, Chat, Rider</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>UserDashboard.js</code></strong><br>Big account area with tabs: Profile, Orders, Password, Wishlist, Tracking, Coins, Notifications.</div>
+        <div class="card"><strong><code>VouchersAndCoins.js</code></strong><br>Coins balance, history, vouchers; "Use Now" flow.</div>
+        <div class="card"><strong><code>UserChat.js</code> / <code>UserOrderTracking.js</code></strong><br>Support chat &amp; live order tracking.</div>
+        <div class="card"><strong><code>RiderRegistration.js</code></strong><br>Delivery partner sign-up form.</div>
+      </div>
+
+      <h4>6.8 The Admin Panel (<code>components/admin/</code>)</h4>
+      <div class="grid3">
+        <div class="card"><strong><code>AdminDashboard.js</code> + <code>AdminSidebar.js</code></strong><br>Shell + left menu; real-time socket toasts.</div>
+        <div class="card"><strong><code>AdminRoute.js</code></strong><br>Security guard: admin exists? logged in? is admin?</div>
+        <div class="card"><strong><code>DashboardHome.js</code></strong><br>Charts &amp; KPIs with Chart.js + live activity feed.</div>
+        <div class="card"><strong><code>ManageDishes.js</code> / <code>AddEditDish.js</code></strong><br>Dish table + full add/edit form (images, sizes, spice).</div>
+        <div class="card"><strong><code>ManageOrders.js</code> / <code>OrderDetails.js</code></strong><br>Order management with status dropdown, bulk delete, CSV.</div>
+        <div class="card"><strong><code>ManageCategories.js</code> / <code>ManageCoupons.js</code> / <code>ManageDeals.js</code></strong><br>Categories (drag-reorder), coupons/vouchers/bonus coins, deals.</div>
+        <div class="card"><strong><code>ManageReviews.js</code> / <code>ManageCustomers.js</code></strong><br>Review moderation; customer cards.</div>
+        <div class="card"><strong><code>DeliveryDashboard.js</code> / <code>Pay.js</code></strong><br>Delivery management with charts; payments dashboard.</div>
+        <div class="card"><strong><code>SystemSettings.jsx</code> / <code>AdminChat.js</code> / <code>Notifications.js</code></strong><br>Full settings panel (10 tabs); admin chat; notifications.</div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 7 ===================== -->
+    <section id="s7">
+      <h3 class="sec"><span class="num">7</span> How the Main Features Work</h3>
+
+      <div class="card"><h4>🧾 User Login</h4>
+        <div class="step"><div class="n">1</div><div class="b">User opens <code>/login</code> (<code>Login.js</code>).</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Formik validates email/password.</div></div>
+        <div class="step"><div class="n">3</div><div class="b"><code>auth.service.login()</code> → <code>POST /api/auth/login</code>.</div></div>
+        <div class="step"><div class="n">4</div><div class="b"><code>auth.controller.login()</code> finds user, checks password (bcrypt), returns a JWT token.</div></div>
+        <div class="step"><div class="n">5</div><div class="b">Frontend saves token in localStorage, dispatches <code>loginSuccess</code>.</div></div>
+        <div class="step"><div class="n">6</div><div class="b">From now on <code>api.js</code> adds <code>Authorization: Bearer &lt;token&gt;</code> to every request.</div></div>
+      </div>
+
+      <div class="card"><h4>🛒 Add to Cart</h4>
+        <div class="step"><div class="n">1</div><div class="b">User clicks "Add to Cart" on a dish card (<code>DishCard.js</code>).</div></div>
+        <div class="step"><div class="n">2</div><div class="b"><code>cartSlice.addToCart()</code> → <code>cart.service.addToCartBackend()</code>.</div></div>
+        <div class="step"><div class="n">3</div><div class="b"><code>cart.controller.addToCart()</code> finds the dish, adds/merges the item, recalculates the total.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Redux updates the cart; the Navbar badge updates instantly.</div></div>
+      </div>
+
+      <div class="card"><h4>📦 Place an Order</h4>
+        <div class="step"><div class="n">1</div><div class="b">User fills the checkout form (<code>Checkout.js</code>) and submits.</div></div>
+        <div class="step"><div class="n">2</div><div class="b"><code>order.service.createOrder()</code> → <code>POST /api/orders</code>.</div></div>
+        <div class="step"><div class="n">3</div><div class="b"><code>order.controller.createOrder()</code> reads the cart, calculates subtotal + delivery fee (free over $500, else $40) + tax (5%) − discount, creates the Order, deletes the cart.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Frontend records payment, emits socket events, clears the cart, shows success screen.</div></div>
+      </div>
+
+      <div class="card"><h4>🚚 Order Status &amp; Live Updates</h4>
+        <div class="step"><div class="n">1</div><div class="b">Admin changes status → <code>PUT /api/orders/:id/status</code>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b"><code>updateOrderStatus()</code> updates the order, creates a notification, emits Socket.IO events.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">The customer's dashboard updates live — no page refresh.</div></div>
+      </div>
+
+      <div class="card"><h4>💬 Customer ↔ Admin Chat</h4>
+        <div class="step"><div class="n">1</div><div class="b">Both connect via Socket.IO and join a shared chat room.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">The <code>send-message</code> handler saves the message in the <code>Chat</code> model and delivers it instantly.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Online status, typing, and read receipts all work over the socket.</div></div>
+      </div>
+
+      <div class="card"><h4>🪙 Coins &amp; Vouchers (Loyalty)</h4>
+        <div class="step"><div class="n">1</div><div class="b">Earn <strong>1 coin per $100</strong> spent (<code>coins.controller.earnCoinsForOrder</code>).</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Tap "Collect" on dish cards for bonus coins (<code>CollectButton.jsx</code>).</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Every <strong>20 completed orders</strong> earns a free-delivery voucher.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Coins are spent on dishes with a "coin discount" (<code>applyCoinsToDish</code>).</div></div>
+        <div class="step"><div class="n">5</div><div class="b">The wallet page (<code>VouchersAndCoins.js</code>) shows balance, history, vouchers.</div></div>
+      </div>
+
+      <div class="card"><h4>⭐ Reviews &amp; Ratings</h4>
+        <div class="step"><div class="n">1</div><div class="b">User adds a review on <code>DishDetail.js</code> → <code>POST /api/reviews/add</code>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b"><code>review.controller.addReview()</code> saves it as <code>pending</code> and recomputes the dish's average rating (approved only).</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Admin approves/rejects in <code>ManageReviews.js</code> → <code>PUT /api/admin/reviews/:id</code>.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Only approved reviews appear publicly.</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 8 ===================== -->
+    <section id="s8">
+      <h3 class="sec"><span class="num">8</span> How to Run This Project</h3>
+
+      <h4>🧰 Prerequisites</h4>
+      <div class="grid3">
+        <div class="card">✅ <strong>Node.js</strong> (v18+) — nodejs.org</div>
+        <div class="card">✅ <strong>MongoDB</strong> (local or Atlas cloud)</div>
+        <div class="card">✅ <strong>VS Code</strong> (recommended editor)</div>
+      </div>
+
+      <h4>🚀 Step 1 — Install dependencies</h4>
+      <pre><span class="lang">bash</span># Install backend libraries
+cd backend
+npm install
+
+# Install frontend libraries
+cd ../frontend
+npm install</pre>
+
+      <h4>🚀 Step 2 — Set up the database</h4>
+      <ul>
+        <li><strong>Option A (local):</strong> Install MongoDB Community Server and start it. The backend expects <code>mongodb://localhost:27017/fast_foodsx</code>.</li>
+        <li><strong>Option B (Atlas cloud):</strong> Create a free cluster, copy the connection string into <code>backend/.env</code> as <code>MONGODB_URI</code>.</li>
+      </ul>
+
+      <h4>🚀 Step 3 — Check the environment files</h4>
+      <pre><span class="lang">backend/.env</span>PORT=5000
+MONGODB_URI=mongodb://localhost:27017/fast_foodsx
+JWT_SECRET=fast_foodsx_super_secret_key_2024_change_this
+JWT_EXPIRE=7d
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+CLOUDINARY_CLOUD_NAME=dvyaqmxtg
+CLOUDINARY_API_KEY=739595241254442
+CLOUDINARY_API_SECRET=ukvCQjKgq01K6QVVfIEprpbpynA
+FRONTEND_URL=http://localhost:3000
+ADMIN_REGISTRATION_SECRET=FASTFOODSX_ADMIN_2024</pre>
+      <div class="callout danger">⚠️ <strong>Never share these secrets publicly.</strong> In production, replace them with your own secure keys.</div>
+      <pre><span class="lang">frontend/.env</span>REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_SOCKET_URL=http://localhost:5000
+REACT_APP_GOOGLE_MAPS_API_KEY=your_google_maps_api_key</pre>
+
+      <h4>🚀 Step 4 — Start the backend</h4>
+      <pre><span class="lang">bash</span>cd backend
+npm run dev        # uses nodemon (auto-restart on changes)
+# or
+npm start          # runs node server.js</pre>
+
+      <h4>🚀 Step 5 — Start the frontend</h4>
+      <pre><span class="lang">bash</span>cd frontend
+npm start</pre>
+      <p>Open <strong>http://localhost:3000</strong> in your browser. 🎉</p>
+
+      <h4>🚀 Step 6 (optional) — Add sample data</h4>
+      <pre><span class="lang">bash</span>cd backend
+node seed-delivery-data.js        # sample deliveries & riders
+node create-permanent-admin.js    # ensure an admin account exists</pre>
+      <div class="callout ok">🔑 <strong>Default admin login:</strong> <code>admin@fastfoodsx.com</code> / <code>Admin@123</code></div>
+    </section>
+
+    <!-- ===================== SECTION 9 ===================== -->
+    <section id="s9">
+      <h3 class="sec"><span class="num">9</span> How to Add a New Feature</h3>
+      <div class="callout info">💡 This is the <strong>most important part for a developer</strong>. Every feature has the same 5 layers — add your code in this order.</div>
+      <div class="grid3">
+        <div class="card"><strong>1. MODEL</strong> (backend) → "how the data looks"</div>
+        <div class="card"><strong>2. CONTROLLER</strong> (backend) → "the logic"</div>
+        <div class="card"><strong>3. ROUTE</strong> (backend) → "the URL"</div>
+        <div class="card"><strong>4. SERVICE</strong> (frontend) → "the messenger"</div>
+        <div class="card"><strong>5. COMPONENT</strong> (frontend) → "the screen"</div>
+      </div>
+
+      <h4>📝 Example: Add a "Favorites" feature</h4>
+
+      <p><strong>Step 1 — Backend Model</strong> (<code>backend/src/models/Favorite.js</code>)</p>
+      <pre><span class="lang">js</span>const mongoose = require('mongoose');
+const favoriteSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  dish: { type: mongoose.Schema.Types.ObjectId, ref: 'Dish', required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+module.exports = mongoose.model('Favorite', favoriteSchema);</pre>
+
+      <p><strong>Step 2 — Backend Controller</strong> (<code>backend/src/controllers/favorite.controller.js</code>)</p>
+      <pre><span class="lang">js</span>const Favorite = require('../models/Favorite');
+exports.addFavorite = async (req, res) => {
+  try {
+    const favorite = await Favorite.create({ user: req.user.id, dish: req.body.dishId });
+    res.status(201).json({ success: true, favorite });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+// ... add removeFavorite, getFavorites</pre>
+
+      <p><strong>Step 3 — Backend Route</strong> (<code>backend/src/routes/favorite.routes.js</code>)</p>
+      <pre><span class="lang">js</span>const router = require('express').Router();
+const { protect } = require('../middleware/auth');
+const { addFavorite, removeFavorite, getFavorites } = require('../controllers/favorite.controller');
+router.use(protect);                 // only logged-in users
+router.post('/', addFavorite);
+router.delete('/:dishId', removeFavorite);
+router.get('/', getFavorites);
+module.exports = router;</pre>
+      <p>Then register the route in <code>backend/server.js</code>:</p>
+      <pre><span class="lang">js</span>const favoriteRoutes = require('./src/routes/favorite.routes');
+app.use('/api/favorites', favoriteRoutes);</pre>
+
+      <p><strong>Step 4 — Frontend Service</strong> (<code>frontend/src/services/favorite.service.js</code>)</p>
+      <pre><span class="lang">js</span>import api from './api';
+export const addFavorite = (dishId) => api.post('/favorites', { dishId });
+export const removeFavorite = (dishId) => api.delete(`/favorites/${dishId}`);
+export const getFavorites = () => api.get('/favorites');</pre>
+
+      <p><strong>Step 5 — Frontend Component + Route in <code>App.js</code></strong></p>
+      <pre><span class="lang">jsx</span>import FavoritesPage from './components/favorites/FavoritesPage';
+// inside &lt;Routes&gt;
+&lt;Route path="/favorites" element={&lt;FavoritesPage /&gt;} /&gt;</pre>
+
+      <p><strong>Step 6 — Test it!</strong> Start both servers and try the new feature.</p>
+      <div class="callout ok">✅ <strong>Tip:</strong> Always copy the style of an existing feature — the <strong>wishlist</strong> is almost identical! Look at <code>user.controller.js</code> → <code>user.routes.js</code> → the wishlist tab in <code>UserDashboard.js</code>.</div>
+
+      <h4>🛠️ Quick tips for common changes</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>"I want to change..."</th><th>Where to look</th></tr></thead>
+        <tbody>
+          <tr><td>A color or font</td><td><code>frontend/src/styles/variables.css</code></td></tr>
+          <tr><td>The delivery fee</td><td><code>backend/src/controllers/order.controller.js</code> and <code>backend/src/models/Setting.js</code></td></tr>
+          <tr><td>The tax rate</td><td><code>backend/src/controllers/order.controller.js</code></td></tr>
+          <tr><td>Menu items / categories</td><td>Admin panel → Manage Dishes / Manage Categories</td></tr>
+          <tr><td>Add a new admin page</td><td>Create component in <code>components/admin/</code>, add route in <code>AdminDashboard.js</code>, add link in <code>AdminSidebar.js</code></td></tr>
+          <tr><td>Add a new API endpoint</td><td>Create controller + route files, register in <code>server.js</code></td></tr>
+          <tr><td>Change how coins are earned</td><td><code>backend/src/controllers/coins.controller.js</code> (<code>earnCoinsForOrder</code>)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== SECTION 10 ===================== -->
+    <section id="s10">
+      <h3 class="sec"><span class="num">10</span> Where Should a New Developer Start?</h3>
+
+      <div class="grid2">
+        <div class="card">
+          <h4>🗺️ Day 1 — Explore (read, don't code yet)</h4>
+          <ol>
+            <li>Read this guide from top to bottom.</li>
+            <li>Read <code>backend/server.js</code> — how all routes connect.</li>
+            <li>Read <code>frontend/src/App.js</code> — how all pages connect.</li>
+            <li>Read <code>frontend/src/services/api.js</code> — how the frontend talks to the backend.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h4>🗺️ Day 2 — Run it locally</h4>
+          <ol>
+            <li>Set up MongoDB + run the backend (<code>npm run dev</code>).</li>
+            <li>Run the frontend (<code>npm start</code>).</li>
+            <li>Click around — create an account, add to cart, place an order.</li>
+            <li>Create the admin account (<code>/admin/register</code>) and explore the panel.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h4>🗺️ Day 3 — Follow one full feature</h4>
+          <p>Pick ONE feature (e.g., the wishlist) and trace it completely:</p>
+          <p><code>UserDashboard.js</code> → <code>services/api.js</code> → HTTP request → <code>server.js</code> → <code>user.routes.js</code> → <code>user.controller.js</code> → <code>User.js</code> model → MongoDB</p>
+          <p>Once you can trace one feature end-to-end, <strong>you understand the whole architecture.</strong></p>
+        </div>
+        <div class="card">
+          <h4>🗺️ Day 4 — Make a small change</h4>
+          <ol>
+            <li>Change a color in <code>variables.css</code> ✅</li>
+            <li>Add a "Delete" button somewhere ✅</li>
+            <li>Add a new API endpoint that returns something simple ✅</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <strong>❌ Where NOT to start:</strong><br>
+        Don't edit <code>server.js</code> line-by-line (it's the wiring, not the features).<br>
+        Don't touch <code>.env</code> files unless setting up your own keys.<br>
+        Don't add new libraries unless you really need them (the project already has many).
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 11 ===================== -->
+    <section id="s11">
+      <h3 class="sec"><span class="num">11</span> Pushing This Project to GitHub</h3>
+      <div class="callout warn">📌 <strong>Important:</strong> The <code>frontend</code> folder has its own <code>.git</code> (from Create React App). For a clean single project, remove it and create one repository at the root.</div>
+
+      <p><strong>1. Open a terminal in the project root</strong> (<code>fast-foodsx</code>).</p>
+      <p><strong>2. Remove the old inner Git folder (optional):</strong></p>
+      <pre><span class="lang">powershell</span>Remove-Item -Recurse -Force "frontend\.git"</pre>
+
+      <p><strong>3. Create a <code>.gitignore</code> file in the root:</strong></p>
+      <pre><span class="lang">gitignore</span>node_modules/
+.env
+*.log
+build/
+dist/
+.DS_Store
+frontend/build/
+backend/logs/
+backend/uploads/</pre>
+      <div class="callout danger">⚠️ <strong>Very important:</strong> The <code>.env</code> files contain <strong>secrets</strong>. Add them to <code>.gitignore</code> and never push them.</div>
+
+      <p><strong>4–6. Initialize, check, and commit:</strong></p>
+      <pre><span class="lang">bash</span>git init
+git status
+git add .
+git commit -m "Initial commit of Fast-FoodsX food ordering app"</pre>
+
+      <p><strong>7. Create an empty repository on GitHub</strong> (github.com/new — name it <code>fast-foodsx</code>, do NOT add a README).</p>
+
+      <p><strong>8. Link and push:</strong></p>
+      <pre><span class="lang">bash</span>git remote add origin https://github.com/YOUR_USERNAME/fast-foodsx.git
+git branch -M main
+git push -u origin main</pre>
+
+      <h4>🔁 Pushing future changes</h4>
+      <pre><span class="lang">bash</span>git add .
+git commit -m "Added X feature / Fixed Y bug"
+git push</pre>
+
+      <h4>🌿 Good Git habits</h4>
+      <ul>
+        <li>Commit <strong>often</strong> with clear messages.</li>
+        <li>Never commit <code>.env</code> or secrets.</li>
+        <li>Use branches for big features: <code>git checkout -b feature/favorites</code>, then merge later.</li>
+        <li>Pull before you push if others are working: <code>git pull</code>.</li>
+      </ul>
+    </section>
+
+    <!-- ===================== SECTION 12 ===================== -->
+    <section id="s12">
+      <h3 class="sec"><span class="num">12</span> Known Issues &amp; Things to Fix</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Issue</th><th>Where</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>⚠️ <code>cart.service.js</code> (backend) imports <code>./api</code> which doesn't exist</td><td><code>backend/src/services/cart.service.js</code></td><td>Leftover frontend file; safe to delete.</td></tr>
+          <tr><td>2</td><td>⚠️ <code>wt.service.js</code> is an exact copy of <code>jwt.service.js</code></td><td><code>backend/src/services/wt.service.js</code></td><td>Duplicate code; delete one.</td></tr>
+          <tr><td>3</td><td>⚠️ <code>chat.socket.js</code> in the frontend is actually backend code</td><td><code>frontend/src/sockets/chat.socket.js</code></td><td>Accidentally copied; doesn't belong in the frontend.</td></tr>
+          <tr><td>4</td><td>🔓 <code>adminReviewRoutes.js</code> has no auth middleware</td><td><code>backend/src/routes/adminReviewRoutes.js</code></td><td>Security gap — anyone could moderate reviews.</td></tr>
+          <tr><td>5</td><td>🔓 <code>payment.Routes.js</code> has no auth ("for testing")</td><td><code>backend/src/routes/payment.Routes.js</code></td><td>Security gap — move logic to a controller &amp; protect it.</td></tr>
+          <tr><td>6</td><td>🔓 <code>upload.routes.js</code> has no auth</td><td><code>backend/src/routes/upload.routes.js</code></td><td>Anyone could upload. Add <code>protect</code>.</td></tr>
+          <tr><td>7</td><td>⚠️ Route name case: <code>payment.routes</code> vs <code>payment.Routes.js</code></td><td><code>backend/server.js</code></td><td>Works on Windows but <strong>breaks on Linux/Mac servers</strong>. Rename to <code>payment.routes.js</code>.</td></tr>
+          <tr><td>8</td><td>⚠️ Some routes registered twice</td><td><code>backend/server.js</code></td><td>Confusing; clean up duplicates.</td></tr>
+          <tr><td>9</td><td>⚠️ Duplicate pages (two dish details, two dashboards, two notification pages)</td><td><code>frontend/src/components/...</code></td><td>Duplicated work; pick one.</td></tr>
+          <tr><td>10</td><td>⚠️ <code>App.test.js</code> expects the default "learn react" text and will fail</td><td><code>frontend/src/App.test.js</code></td><td>Write a real test or remove it.</td></tr>
+          <tr><td>11</td><td>⚠️ Placeholder Google Maps key</td><td><code>frontend/.env</code></td><td>Map features need a real key.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== SECTION 13 ===================== -->
+    <section id="s13">
+      <h3 class="sec"><span class="num">13</span> Simple Glossary for Non-Technical Readers</h3>
+      <div class="grid3">
+        <div class="card"><strong>API</strong><br>URLs the frontend uses to ask the backend for data — a restaurant menu of requests.</div>
+        <div class="card"><strong>Backend</strong><br>The server-side code that processes requests and runs the logic.</div>
+        <div class="card"><strong>Frontend</strong><br>The code that draws pages in the browser (what users see).</div>
+        <div class="card"><strong>Database</strong><br>The storage where all data lives (MongoDB).</div>
+        <div class="card"><strong>Model</strong><br>A description of one data item (e.g., "a Dish has name, price, image").</div>
+        <div class="card"><strong>Route / Endpoint</strong><br>A specific URL + method (e.g., <code>POST /api/cart/add</code>).</div>
+        <div class="card"><strong>Controller</strong><br>The function that handles a request and decides what to do.</div>
+        <div class="card"><strong>Middleware</strong><br>Code that runs between the request and the controller (login check, uploads).</div>
+        <div class="card"><strong>Token (JWT)</strong><br>A digital login ticket proving who you are.</div>
+        <div class="card"><strong>OTP</strong><br>One-Time Password — a 6-digit code for password reset.</div>
+        <div class="card"><strong>Mongoose</strong><br>Helper library for talking to MongoDB from Node.js.</div>
+        <div class="card"><strong>JSON</strong><br>A text format for sending data between frontend and backend.</div>
+        <div class="card"><strong>Socket / Real-time</strong><br>Instant communication — no page refresh needed.</div>
+        <div class="card"><strong>Redux</strong><br>The app's shared "memory" (login, cart) available everywhere.</div>
+        <div class="card"><strong>Component</strong><br>A reusable UI piece (a button, a card, a page).</div>
+        <div class="card"><strong>Hook</strong><br>A React function that gives a component extra abilities.</div>
+        <div class="card"><strong>Seeder / Script</strong><br>A program that fills the database with sample data.</div>
+        <div class="card"><strong>Deploy / Production</strong><br>Putting the app on a real server for the public.</div>
+        <div class="card"><strong>Repository (repo)</strong><br>Your code folder tracked by Git/GitHub.</div>
+        <div class="card"><strong>Commit</strong><br>A saved snapshot of your code changes.</div>
+        <div class="card"><strong>Push</strong><br>Uploading your commits to GitHub.</div>
+      </div>
+
+      <div class="hero" style="margin-top:30px;">
+        <h2>🎉 You now know <span>everything</span> about Fast-FoodsX!</h2>
+        <p>The best way to learn is to <strong>run it, click around, and trace one feature end-to-end. Happy coding! 🚀</strong></p>
+        <p><a href="USER_GUIDE.html" style="color:var(--purple-3);">📘 Open the User Guide →</a></p>
+      </div>
+    </section>
+
+    <footer>FAST-FOODSX — Complete Technical Guide · Built with 💜 in the purple &amp; black glass neon theme</footer>
+  </main>
+</div>
+
+<script>
+  // Scrollspy: highlight the active section in the sidebar
+  const links = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('section[id]');
+  const spy = () => {
+    let current = sections[0]?.id;
+    for (const s of sections) {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    }
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  };
+  document.addEventListener('scroll', spy);
+  spy();
+</script>
+</body>
+</html>

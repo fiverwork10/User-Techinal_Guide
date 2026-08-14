@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAST-FOODSX — User Guide</title>
+<style>
+  :root {
+    --bg: #050108;
+    --purple: #a855f7;
+    --purple-2: #7c3aed;
+    --purple-3: #c084fc;
+    --pink: #e879f9;
+    --cyan: #22d3ee;
+    --text: #e9e2f5;
+    --text-dim: #a99ec2;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(168,85,247,0.28);
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --ok: #34d399;
+    --mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:20px; }
+  body {
+    font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background: radial-gradient(1200px 800px at 80% -10%, rgba(168,85,247,0.16), transparent 60%),
+                radial-gradient(1000px 700px at -10% 30%, rgba(124,58,237,0.14), transparent 55%),
+                var(--bg);
+    color: var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  .orb { position:fixed; border-radius:50%; filter:blur(90px); opacity:.35; z-index:-1; animation: float 14s ease-in-out infinite; }
+  .orb1 { width:420px; height:420px; background:#7c3aed; top:-120px; left:-120px; }
+  .orb2 { width:380px; height:380px; background:#a855f7; bottom:-120px; right:-100px; animation-delay:-5s; }
+  .orb3 { width:260px; height:260px; background:#4c1d95; top:45%; left:55%; animation-delay:-9s; }
+  @keyframes float { 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(30px,-40px);} }
+
+  .layout { display:flex; max-width:1500px; margin:0 auto; gap:28px; padding:24px; }
+
+  aside {
+    width:300px; min-width:300px; height:calc(100vh - 48px);
+    position:sticky; top:24px;
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:20px;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    padding:22px 14px; overflow-y:auto;
+    box-shadow:0 0 40px rgba(168,85,247,.15), inset 0 0 30px rgba(168,85,247,.04);
+  }
+  aside::-webkit-scrollbar { width:6px; }
+  aside::-webkit-scrollbar-thumb { background:var(--purple); border-radius:6px; }
+  .brand { text-align:center; padding:8px 4px 16px; border-bottom:1px solid rgba(168,85,247,.2); margin-bottom:14px; }
+  .brand .logo {
+    width:64px; height:64px; margin:0 auto 10px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+    font-size:32px; background:linear-gradient(135deg, var(--purple), var(--purple-2));
+    box-shadow:0 0 30px rgba(168,85,247,.55), 0 0 60px rgba(124,58,237,.3);
+  }
+  .brand h1 { font-size:20px; letter-spacing:.5px; }
+  .brand p { font-size:12px; color:var(--text-dim); }
+  .toc-title { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--purple-3); margin:10px 6px; }
+  .toc { list-style:none; }
+  .toc li { margin:2px 0; }
+  .toc a {
+    display:block; padding:7px 12px; border-radius:10px; font-size:13px; color:var(--text-dim);
+    text-decoration:none; border-left:3px solid transparent; transition:.2s;
+  }
+  .toc a:hover { color:#fff; background:rgba(168,85,247,.12); border-left-color:var(--purple); }
+  .toc a.active { color:#fff; background:linear-gradient(90deg, rgba(168,85,247,.22), transparent); border-left-color:var(--purple-3); }
+
+  main { flex:1; min-width:0; }
+  .hero {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:24px;
+    padding:46px 40px; margin-bottom:28px; position:relative; overflow:hidden;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    box-shadow:0 0 60px rgba(168,85,247,.18), inset 0 0 60px rgba(124,58,237,.05);
+  }
+  .hero::before { content:''; position:absolute; top:-50%; left:20%; width:60%; height:200%; background:linear-gradient(90deg, transparent, rgba(168,85,247,.08), transparent); transform:rotate(15deg); animation:shine 8s linear infinite; }
+  @keyframes shine { 0%{ transform:translateX(-100%) rotate(15deg);} 100%{ transform:translateX(250%) rotate(15deg);} }
+  .hero .tag {
+    display:inline-block; padding:5px 14px; border-radius:999px; font-size:12px; font-weight:600;
+    background:linear-gradient(90deg, rgba(168,85,247,.25), rgba(124,58,237,.25));
+    border:1px solid var(--glass-border); color:var(--purple-3); margin-bottom:14px;
+  }
+  .hero h2 { font-size:34px; margin-bottom:12px; }
+  .hero h2 span { background:linear-gradient(90deg, var(--purple-3), var(--pink), var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { color:var(--text-dim); max-width:760px; font-size:15px; }
+
+  section { margin-bottom:40px; scroll-margin-top:20px; }
+  h3.sec {
+    font-size:24px; margin:10px 0 20px; padding-bottom:12px;
+    border-bottom:2px solid; border-image:linear-gradient(90deg, var(--purple), transparent) 1;
+    display:flex; align-items:center; gap:12px;
+  }
+  h3.sec .num {
+    min-width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center;
+    border-radius:12px; font-size:16px; font-weight:800;
+    background:linear-gradient(135deg, var(--purple), var(--purple-2));
+    box-shadow:0 0 22px rgba(168,85,247,.5);
+  }
+  h4 { color:var(--purple-3); font-size:17px; margin:26px 0 10px; }
+  p { margin:10px 0; }
+  strong { color:#fff; }
+
+  .card {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+    padding:20px 22px; margin:14px 0; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    transition:.25s;
+  }
+  .card:hover { border-color:rgba(192,132,252,.5); box-shadow:0 0 30px rgba(168,85,247,.22); transform:translateY(-2px); }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px; }
+
+  .tbl-wrap { overflow-x:auto; margin:16px 0; border-radius:14px; border:1px solid var(--glass-border); background:var(--glass); backdrop-filter:blur(10px); }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { background:linear-gradient(90deg, rgba(168,85,247,.22), rgba(124,58,237,.1)); color:var(--purple-3); text-align:left; padding:12px 14px; font-size:12.5px; letter-spacing:.5px; text-transform:uppercase; }
+  td { padding:11px 14px; border-top:1px solid rgba(168,85,247,.12); vertical-align:top; }
+  tr:hover td { background:rgba(168,85,247,.06); }
+
+  code { font-family:var(--mono); background:rgba(168,85,247,.14); color:var(--pink); padding:2px 6px; border-radius:6px; font-size:.9em; }
+
+  .callout { border-radius:14px; padding:14px 18px; margin:16px 0; border-left:4px solid; font-size:14px; }
+  .callout.info { background:rgba(34,211,238,.08); border-color:var(--cyan); color:#b8eefb; }
+  .callout.warn { background:rgba(251,191,36,.08); border-color:var(--warn); color:#fde9c3; }
+  .callout.danger { background:rgba(248,113,113,.08); border-color:var(--danger); color:#ffd6d6; }
+  .callout.ok { background:rgba(52,211,153,.08); border-color:var(--ok); color:#c6f7e4; }
+
+  ul, ol { padding-left:24px; margin:10px 0; }
+  li { margin:5px 0; }
+  li::marker { color:var(--purple-3); }
+
+  .step { display:flex; gap:14px; margin:12px 0; align-items:flex-start; }
+  .step .n { min-width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg, var(--purple), var(--purple-2)); display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow:0 0 16px rgba(168,85,247,.45); }
+  .step .b { flex:1; }
+
+  .status { display:flex; align-items:center; gap:8px; font-size:14px; margin:8px 0; }
+  .status .dot { width:12px; height:12px; border-radius:50%; box-shadow:0 0 10px currentColor; }
+  .s-pending{ color:#fbbf24; } .s-pending .dot{ background:#fbbf24; }
+  .s-confirmed{ color:#60a5fa; } .s-confirmed .dot{ background:#60a5fa; }
+  .s-preparing{ color:#f97316; } .s-preparing .dot{ background:#f97316; }
+  .s-out{ color:#c084fc; } .s-out .dot{ background:#c084fc; }
+  .s-delivered{ color:#34d399; } .s-delivered .dot{ background:#34d399; }
+  .s-cancelled{ color:#f87171; } .s-cancelled .dot{ background:#f87171; }
+
+  footer { text-align:center; color:var(--text-dim); font-size:13px; padding:30px 10px 10px; border-top:1px solid rgba(168,85,247,.15); margin-top:20px; }
+  @media (max-width:1024px){ .layout { flex-direction:column; } aside { position:static; width:100%; height:auto; max-height:360px; } }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+<div class="layout">
+  <aside>
+    <div class="brand">
+      <div class="logo">🍔</div>
+      <h1>FAST-FOODSX</h1>
+      <p>User Guide · No tech needed</p>
+    </div>
+    <div class="toc-title">Contents</div>
+    <ul class="toc">
+      <li><a href="#s1">1. Getting Started</a></li>
+      <li><a href="#s2">2. How to Order Food</a></li>
+      <li><a href="#s3">3. Your Account &amp; Profile</a></li>
+      <li><a href="#s4">4. Coins, Vouchers &amp; Rewards</a></li>
+      <li><a href="#s5">5. Order Tracking &amp; Delivery</a></li>
+      <li><a href="#s6">6. Reviews &amp; Ratings</a></li>
+      <li><a href="#s7">7. Support Chat &amp; Contact</a></li>
+      <li><a href="#s8">8. For Admins</a></li>
+      <li><a href="#s9">9. For Delivery Partners</a></li>
+      <li><a href="#s10">10. Troubleshooting &amp; FAQ</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <span class="tag">😊 For Everyone</span>
+      <h2>FAST-FOODSX <span>User Guide</span></h2>
+      <p>A friendly, step-by-step guide for <strong>customers, admins, and delivery partners</strong>. No technical knowledge needed — just follow along. 😊</p>
+    </div>
+
+    <!-- ===================== SECTION 1 ===================== -->
+    <section id="s1">
+      <h3 class="sec"><span class="num">1</span> Getting Started</h3>
+
+      <div class="card">
+        <h4>🌐 Opening the website</h4>
+        <div class="step"><div class="n">1</div><div class="b">Open your browser (Chrome, Edge, Firefox).</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Go to: <strong>http://localhost:3000</strong></div></div>
+        <div class="step"><div class="n">3</div><div class="b">You'll see the homepage with the animated intro, trending dishes, and the full menu below.</div></div>
+        <div class="callout info">💡 If the site doesn't load, make sure the <strong>backend server</strong> is also running (see the Technical Guide for setup).</div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h4>👤 Creating an account</h4>
+          <div class="step"><div class="n">1</div><div class="b">Click <strong>"Sign Up / Register"</strong> in the top menu.</div></div>
+          <div class="step"><div class="n">2</div><div class="b">Fill in your <strong>name</strong>, <strong>email</strong>, <strong>phone</strong> (optional), and a <strong>password</strong> (at least 6 characters).</div></div>
+          <div class="step"><div class="n">3</div><div class="b">Type the password again to confirm.</div></div>
+          <div class="step"><div class="n">4</div><div class="b">Click <strong>Register</strong> — you're now logged in automatically! 🎉</div></div>
+        </div>
+        <div class="card">
+          <h4>🔑 Logging in</h4>
+          <div class="step"><div class="n">1</div><div class="b">Click <strong>"Login"</strong> in the top menu.</div></div>
+          <div class="step"><div class="n">2</div><div class="b">Enter your <strong>email</strong> and <strong>password</strong>.</div></div>
+          <div class="step"><div class="n">3</div><div class="b">Click <strong>Login</strong>.
+            <ul>
+              <li>Regular customers → go to the <strong>homepage</strong>.</li>
+              <li>Admin accounts → go to the <strong>Admin Panel</strong>.</li>
+            </ul>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>🔐 Forgot your password?</h4>
+        <div class="step"><div class="n">1</div><div class="b">On the login page, click <strong>"Forgot Password"</strong>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Enter your <strong>email</strong> and click <strong>Send OTP</strong>.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Check your email for a <strong>6-digit code</strong>.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Enter the code, choose a <strong>new password</strong>, click <strong>Reset</strong>.</div></div>
+        <div class="step"><div class="n">5</div><div class="b">Log in with your new password.</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 2 ===================== -->
+    <section id="s2">
+      <h3 class="sec"><span class="num">2</span> For Customers — How to Order Food</h3>
+
+      <div class="card">
+        <h4>🍽️ Browsing the menu</h4>
+        <ul>
+          <li>Click <strong>"Dishes / Menu"</strong> in the top menu to see all food items.</li>
+          <li>Use the <strong>search box</strong> to find a dish by name.</li>
+          <li>Use <strong>filters</strong> to narrow by: <strong>Category</strong> · <strong>Price range</strong> · <strong>Availability</strong> · <strong>Rating</strong></li>
+          <li>Use <strong>Sort</strong> by price (low→high / high→low), rating, or newest.</li>
+          <li>Click <strong>"Load More"</strong> at the bottom to see more dishes.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h4>📖 Viewing a dish</h4>
+        <p>Click any dish to open its <strong>detail page</strong>, where you can see:</p>
+        <div class="grid3">
+          <div class="card">🖼️ Pictures of the dish</div>
+          <div class="card">📝 Full description</div>
+          <div class="card">📏 Sizes (pick one to change the price)</div>
+          <div class="card">🌶️ Spice level &amp; toppings</div>
+          <div class="card">🔢 Quantity (+ / − buttons)</div>
+          <div class="card">💬 Special instructions (e.g., "no onions")</div>
+          <div class="card">⭐ Rating and customer reviews</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>🛒 Adding to cart &amp; your cart</h4>
+        <div class="step"><div class="n">1</div><div class="b">On a dish card or dish page, click <strong>"Add to Cart"</strong>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">The cart icon in the top menu shows the total number of items.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Click the <strong>cart icon</strong> to open your cart.</div></div>
+        <p>In the cart page you can <strong>change quantities</strong>, <strong>remove</strong> items, <strong>clear</strong> the whole cart, and see the summary: <strong>Subtotal · Delivery Fee · Tax · Total</strong>.</p>
+        <div class="callout info">💡 <strong>Good to know:</strong> Delivery is <strong>free for orders above $500</strong>. Otherwise a delivery fee of <strong>$40</strong> applies.</div>
+      </div>
+
+      <div class="card">
+        <h4>💳 Checkout (paying for your order)</h4>
+        <div class="step"><div class="n">1</div><div class="b">Click <strong>"Proceed to Checkout"</strong>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Fill in <strong>contact details</strong> (name, email, phone) and the <strong>delivery address</strong> — or click <strong>"Use My Current Location"</strong>.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Choose a <strong>payment method</strong>:
+          <ul>
+            <li><strong>Cash on Delivery</strong> 💵 — pay when your food arrives</li>
+            <li><strong>Card</strong> 💳 — card number, expiry, CVV</li>
+            <li><strong>UPI</strong> 📱 — your UPI ID</li>
+          </ul>
+        </div></div>
+        <div class="step"><div class="n">4</div><div class="b">Add a <strong>coupon code</strong> if you have one.</div></div>
+        <div class="step"><div class="n">5</div><div class="b">Add any <strong>special instructions</strong>.</div></div>
+        <div class="step"><div class="n">6</div><div class="b">Click <strong>Place Order</strong> and watch the success screen with your order number. 🎉</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 3 ===================== -->
+    <section id="s3">
+      <h3 class="sec"><span class="num">3</span> Your Account &amp; Profile</h3>
+      <p>Click your name (or the user icon) in the top menu and go to <strong>"Dashboard"</strong>. Here you'll find a menu with tabs:</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Tab</th><th>What you can do</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Profile</strong></td><td>Edit name, email, phone; manage delivery addresses</td></tr>
+          <tr><td><strong>My Orders</strong></td><td>See all your orders and their status</td></tr>
+          <tr><td><strong>Order History</strong></td><td>Full list of past orders (with bulk selection)</td></tr>
+          <tr><td><strong>Password &amp; Security</strong></td><td>Change your password</td></tr>
+          <tr><td><strong>Wishlist</strong></td><td>Dishes you saved for later</td></tr>
+          <tr><td><strong>Order Tracking</strong></td><td>Live status of your current order</td></tr>
+          <tr><td><strong>Coins &amp; Vouchers</strong></td><td>Your rewards wallet</td></tr>
+          <tr><td><strong>Notifications</strong></td><td>All app notifications</td></tr>
+          <tr><td><strong>Logout / Delete</strong></td><td>Sign out or delete your account</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== SECTION 4 ===================== -->
+    <section id="s4">
+      <h3 class="sec"><span class="num">4</span> Coins, Vouchers &amp; Rewards</h3>
+
+      <div class="grid2">
+        <div class="card">
+          <h4>🪙 What are Coins?</h4>
+          <p>Coins are a <strong>loyalty reward</strong>. Earn them, then spend them to get discounts.</p>
+          <p><strong>How to earn coins:</strong></p>
+          <ul>
+            <li>🛒 <strong>Place orders</strong> — earn <strong>1 coin for every $100</strong> spent</li>
+            <li>✨ Tap <strong>"Collect"</strong> on dish cards to earn <strong>bonus coins</strong></li>
+            <li>🎁 <strong>Special promotions</strong> (birthday bonuses, referrals)</li>
+          </ul>
+          <p><strong>How to use coins:</strong> look for dishes with a <strong>coin discount</strong> badge and click <strong>"Use Coins"</strong>.</p>
+        </div>
+        <div class="card">
+          <h4>🎟️ What are Vouchers?</h4>
+          <p>Vouchers are special offers like <strong>Free Delivery</strong> or <strong>% off</strong> your order.</p>
+          <ul>
+            <li>Earn a <strong>free-delivery voucher</strong> for every <strong>20 completed orders</strong>.</li>
+            <li>Collect vouchers by tapping <strong>"Collect"</strong> on special dishes.</li>
+            <li>In <strong>Coins &amp; Vouchers</strong>, click <strong>"Use Now"</strong>, then place your order — the discount is applied at checkout.</li>
+          </ul>
+          <div class="callout warn">⚠️ Vouchers have an <strong>expiry date</strong> — use them before they expire!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 5 ===================== -->
+    <section id="s5">
+      <h3 class="sec"><span class="num">5</span> Order Tracking &amp; Delivery</h3>
+      <div class="card">
+        <h4>🚚 After you place an order</h4>
+        <p>Your order goes through these statuses:</p>
+        <div class="status s-pending"><span class="dot"></span> Pending →</div>
+        <div class="status s-confirmed"><span class="dot"></span> Confirmed →</div>
+        <div class="status s-preparing"><span class="dot"></span> Preparing →</div>
+        <div class="status s-out"><span class="dot"></span> Out for Delivery →</div>
+        <div class="status s-delivered"><span class="dot"></span> Delivered</div>
+        <div class="status s-cancelled"><span class="dot"></span> Cancelled / Rejected (with a reason)</div>
+      </div>
+      <div class="card">
+        <h4>📍 Tracking live</h4>
+        <div class="step"><div class="n">1</div><div class="b">Open <strong>Dashboard → Order Tracking</strong>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">The status updates <strong>live</strong> — no need to refresh the page.</div></div>
+        <div class="step"><div class="n">3</div><div class="b">You can also <strong>chat with the restaurant</strong> if you have questions about your order.</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 6 ===================== -->
+    <section id="s6">
+      <h3 class="sec"><span class="num">6</span> Reviews &amp; Ratings</h3>
+      <div class="card">
+        <h4>⭐ Writing a review</h4>
+        <div class="step"><div class="n">1</div><div class="b">Open a dish's detail page and scroll to <strong>Customer Reviews</strong>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Choose a <strong>star rating</strong> (1 to 5).</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Type your <strong>comment</strong> (add an emoji 😋 or a <strong>photo</strong> if you like).</div></div>
+        <div class="step"><div class="n">4</div><div class="b">Click <strong>Submit</strong>.</div></div>
+        <div class="callout info">🔍 <strong>A note about approval:</strong> Reviews are checked by the restaurant before appearing publicly. <strong>Only approved reviews are shown</strong> — if yours doesn't appear immediately, it's waiting for approval.</div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 7 ===================== -->
+    <section id="s7">
+      <h3 class="sec"><span class="num">7</span> Support Chat &amp; Contact</h3>
+      <div class="grid2">
+        <div class="card">
+          <h4>💬 Live chat</h4>
+          <ul>
+            <li>Open the <strong>chat window</strong> from your dashboard (or the chat icon).</li>
+            <li>Type your message and press send.</li>
+            <li>The restaurant/admin replies in <strong>real time</strong>.</li>
+            <li>You'll see when the other person is <strong>typing</strong>, and when your message is <strong>read</strong>.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>📞 Contact us</h4>
+          <ul>
+            <li>Go to the <strong>Contact</strong> page.</li>
+            <li>Fill in name, email, phone, subject, and message.</li>
+            <li>Click <strong>Send</strong> — you'll receive a <strong>confirmation email</strong>.</li>
+            <li>The restaurant can reply to your message.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 8 ===================== -->
+    <section id="s8">
+      <h3 class="sec"><span class="num">8</span> For Admins — Running the Store</h3>
+      <p>To access the admin panel: log in with an <strong>admin account</strong>, then go to <strong>http://localhost:3000/admin</strong></p>
+
+      <div class="card">
+        <h4>🛡️ First-time admin setup</h4>
+        <div class="step"><div class="n">1</div><div class="b">Go to <code>/admin/register</code>.</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Create the admin account (name, email, password).</div></div>
+        <div class="step"><div class="n">3</div><div class="b">Log in with those details.</div></div>
+        <div class="callout ok">🔑 Default admin from the setup script: <code>admin@fastfoodsx.com</code> / <code>Admin@123</code></div>
+      </div>
+
+      <h4>🎛️ The admin dashboard</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Menu item</th><th>What it lets you do</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dashboard</strong></td><td>Overview: dishes, categories, customers, orders, revenue, average rating + live charts &amp; activity feed</td></tr>
+          <tr><td><strong>Manage Dishes</strong></td><td>Add, edit, delete, search, filter, export (CSV) food items; upload images; sizes, spice, toppings</td></tr>
+          <tr><td><strong>Manage Categories</strong></td><td>Add, edit, delete, reorder (drag &amp; drop) menu categories</td></tr>
+          <tr><td><strong>Manage Orders</strong></td><td>See all orders, change status, search, bulk delete, export CSV, chat with customers</td></tr>
+          <tr><td><strong>Delivery Management</strong></td><td>See deliveries, assign delivery partners, track status, view charts</td></tr>
+          <tr><td><strong>Customer Management</strong></td><td>View all customers and their details</td></tr>
+          <tr><td><strong>Reviews</strong></td><td>Approve, reject, reply to, or delete customer reviews</td></tr>
+          <tr><td><strong>Coupons &amp; Vouchers</strong></td><td>Create coupons, coin discounts, vouchers; give bonus coins</td></tr>
+          <tr><td><strong>Payments</strong></td><td>View payment records, approve/decline, export</td></tr>
+          <tr><td><strong>Notifications</strong></td><td>View all notifications, mark read/delete</td></tr>
+          <tr><td><strong>System Settings</strong></td><td>Store details, payment options, delivery fees, tax, working hours, and more</td></tr>
+          <tr><td><strong>Admin Chat</strong></td><td>Reply to customer support messages in real time</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>⚙️ Useful admin tips</h4>
+      <div class="grid2">
+        <div class="card">💵 <strong>Change delivery fee / tax:</strong> System Settings → Delivery / Tax</div>
+        <div class="card">✅ <strong>Make a dish available:</strong> edit the dish → toggle <strong>Available</strong></div>
+        <div class="card">🏷️ <strong>Add a deal:</strong> Deals → create → pick dishes → set discount</div>
+        <div class="card">⭐ <strong>Approve a review:</strong> Reviews → click <strong>Approve</strong></div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 9 ===================== -->
+    <section id="s9">
+      <h3 class="sec"><span class="num">9</span> For Delivery Partners (Riders)</h3>
+      <div class="card">
+        <h4>📝 Registering as a rider</h4>
+        <div class="step"><div class="n">1</div><div class="b">Open the <strong>Rider Registration</strong> page (link in the footer/menu).</div></div>
+        <div class="step"><div class="n">2</div><div class="b">Fill in:
+          <ul>
+            <li><strong>Personal info</strong> (name, email, phone, age)</li>
+            <li><strong>Address</strong> (street, city, state, ZIP)</li>
+            <li><strong>Vehicle &amp; license</strong> (bike/scooter/car, vehicle number, license number)</li>
+            <li>A <strong>password</strong> and an optional <strong>profile photo</strong></li>
+          </ul>
+        </div></div>
+        <div class="step"><div class="n">3</div><div class="b">Click <strong>Register as Rider</strong>.</div></div>
+        <div class="step"><div class="n">4</div><div class="b">An admin reviews your application before you start delivering.</div></div>
+      </div>
+      <div class="card">
+        <h4>🛵 While delivering</h4>
+        <ul>
+          <li>Admins assign deliveries to you from the <strong>Delivery Management</strong> page.</li>
+          <li>Keep your <strong>location</strong> and <strong>status</strong> updated so customers can track their food.</li>
+          <li>Your <strong>rating</strong>, <strong>deliveries completed</strong>, and <strong>earnings</strong> are tracked by the system.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 10 ===================== -->
+    <section id="s10">
+      <h3 class="sec"><span class="num">10</span> Troubleshooting &amp; FAQ</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Problem</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>❓ "I can't log in"</td><td>Check email/password; use <strong>Forgot Password</strong> to reset; if "account deactivated", contact the store admin.</td></tr>
+          <tr><td>❓ "My review is pending"</td><td>Reviews are approved by the admin before showing — this is normal.</td></tr>
+          <tr><td>❓ "My cart is empty after refresh"</td><td>Make sure you're <strong>logged in</strong> — the cart is saved per account.</td></tr>
+          <tr><td>❓ "The delivery fee seems high"</td><td>Orders <strong>above $500</strong> get <strong>free delivery</strong>. Below that, a fee applies.</td></tr>
+          <tr><td>❓ "Where is my voucher / coin?"</td><td>Check <strong>Dashboard → Coins &amp; Vouchers</strong>. Coins are earned per order; vouchers have expiry dates.</td></tr>
+          <tr><td>❓ "The chat isn't sending"</td><td>Make sure you're logged in and the server/internet is working; try reloading.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>❓ What do the order statuses mean?</h4>
+      <div class="grid2">
+        <div class="card"><div class="status s-pending"><span class="dot"></span> <strong>Pending</strong> — your order was received, waiting to be confirmed</div></div>
+        <div class="card"><div class="status s-confirmed"><span class="dot"></span> <strong>Confirmed</strong> — the restaurant accepted your order</div></div>
+        <div class="card"><div class="status s-preparing"><span class="dot"></span> <strong>Preparing</strong> — your food is being cooked 🍳</div></div>
+        <div class="card"><div class="status s-out"><span class="dot"></span> <strong>Out for Delivery</strong> — a rider is on the way 🛵</div></div>
+        <div class="card"><div class="status s-delivered"><span class="dot"></span> <strong>Delivered</strong> — enjoy your food! 🍔</div></div>
+        <div class="card"><div class="status s-cancelled"><span class="dot"></span> <strong>Cancelled / Rejected</strong> — could not be fulfilled (reason shown)</div></div>
+      </div>
+
+      <div class="hero" style="margin-top:30px;">
+        <h2>🎉 Enjoy <span>Fast-FoodsX</span>!</h2>
+        <p><strong>Quick recap:</strong> 🍽️ Order: Browse → Add to cart → Checkout → Pay · 🪙 Save: Earn coins &amp; vouchers, use coupons · 📍 Track: Live order status · 💬 Support: Chat or contact form · 🛡️ Admins: Full control panel with charts.</p>
+        <p><a href="TECHNICAL_GUIDE.html" style="color:var(--purple-3);">⚡ Open the Technical Guide →</a></p>
+      </div>
+    </section>
+
+    <footer>FAST-FOODSX — User Guide · Built with 💜 in the purple &amp; black glass neon theme</footer>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('section[id]');
+  const spy = () => {
+    let current = sections[0]?.id;
+    for (const s of sections) {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+  };
+  document.addEventListener('scroll', spy);
+  spy();
+</script>
+</body>
+</html>
