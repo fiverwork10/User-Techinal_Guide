@@ -2,5 +2,6 @@
 
 This repository contains the user guide and technical guide for the FAST-FOODSX food-ordering application.
 
-- **USER_GUIDE.md / USER_GUIDE.html** - Plain-language guide for customers, admins, and delivery partners.
-- **TECHNICAL_GUIDE.md / TECHNICAL_GUIDE.html** - Developer documentation covering architecture, tech stack, project structure, and feature development.
+- **GUIDE.html** - Combined single-page guide. Use the **navbar** at the top to switch between the **📘 User Guide** and the **⚡ Technical Guide**.
+- **TECHNICAL_GUIDE.md** - Developer documentation covering architecture, tech stack, project structure, and feature development.
+- **USER_GUIDE.md** - Plain-language guide for customers, admins, and delivery partners.
